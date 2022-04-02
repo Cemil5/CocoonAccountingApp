@@ -17,9 +17,6 @@ import java.time.LocalDateTime;
 @Component
 public class BaseEntityListener extends AuditingEntityListener {
 
-    @Autowired
-    IAuthenticationFacade iAuthenticationFacade;
-
     @PrePersist
     public void onPrePersist(BaseEntity baseEntity) throws CocoonException {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
