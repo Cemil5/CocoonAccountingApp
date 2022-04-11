@@ -15,6 +15,12 @@ import javax.persistence.*;
 @Where(clause = "is_deleted=false")
 public class InvoiceProduct extends BaseEntity{
 
+    private String name;
+
+    private int qty;
+    private int price;
+    private int tax;
+
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "product_id")
     private Product product;
@@ -22,12 +28,6 @@ public class InvoiceProduct extends BaseEntity{
     @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
-
-    private String name;
-
-    private int qty;
-    private int price;
-    private int tax;
 
     public String getProductQuantityUnitText(){
         return qty + " / " + product.getUnit().getValue();

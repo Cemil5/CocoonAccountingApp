@@ -1,4 +1,4 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.entity.User;
 import com.cocoon.repository.UserRepo;

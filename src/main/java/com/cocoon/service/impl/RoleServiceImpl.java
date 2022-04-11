@@ -1,15 +1,13 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.entity.Role;
 import com.cocoon.repository.RoleRepo;
 import com.cocoon.service.RoleService;
 import com.cocoon.util.MapperUtil;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service

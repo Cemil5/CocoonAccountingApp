@@ -1,4 +1,4 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.dto.UserDTO;
 import com.cocoon.entity.User;
@@ -67,13 +67,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO findById(Long id) throws CocoonException {
+        User user;
         if (isUserRoot()) {
-            User user = userRepo.findById(id).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
-            return mapperUtil.convert(user, new UserDTO());
+            user = userRepo.findById(id).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
         } else {
-            User user = userRepo.findByIdAndCompanyId(id, companyService.getCompanyByLoggedInUser().getId()).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
-            return mapperUtil.convert(user, new UserDTO());
+            user = userRepo.findByIdAndCompanyId(id, companyService.getCompanyByLoggedInUser().getId()).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
         }
+        return mapperUtil.convert(user, new UserDTO());
     }
 
     @Override
@@ -84,16 +84,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(Long id) throws CocoonException {
-
+        User user;
         if (isUserRoot()) {
-            User user = userRepo.findById(id).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
-            user.setIsDeleted(true);
-            userRepo.save(user);
+            user = userRepo.findById(id).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
         } else {
-            User user = userRepo.findByIdAndCompanyId(id, companyService.getCompanyByLoggedInUser().getId()).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
-            user.setIsDeleted(true);
-            userRepo.save(user);
+            user = userRepo.findByIdAndCompanyId(id, companyService.getCompanyByLoggedInUser().getId()).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
         }
+        user.setIsDeleted(true);
+        userRepo.save(user);
     }
 
     @Override

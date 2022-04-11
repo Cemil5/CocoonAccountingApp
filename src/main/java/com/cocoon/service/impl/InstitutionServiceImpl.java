@@ -1,4 +1,4 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.dto.InstitutionDTO;
 import com.cocoon.entity.payment.Institution;
@@ -7,26 +7,13 @@ import com.cocoon.repository.InstitutionsRepo;
 import com.cocoon.service.InstitutionService;
 import com.cocoon.util.MapperUtil;
 import com.cocoon.util.payment.ApiClientUtils;
-import com.cocoon.util.payment.Constants;
-import com.cocoon.util.payment.PaymentRequestUtils;
-import com.cocoon.util.payment.UserUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import yapily.ApiClient;
 import yapily.ApiException;
-import yapily.auth.HttpBasicAuth;
 import yapily.sdk.*;
 
-import java.awt.*;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 public class InstitutionServiceImpl implements InstitutionService {
 
-    private WebClient webClient = WebClient.builder().baseUrl("https://api.yapily.com").build();
+    private final WebClient webClient = WebClient.builder().baseUrl("https://api.yapily.com").build();
 
     private final InstitutionsRepo institutionsRepo;
     private final MapperUtil mapperUtil;

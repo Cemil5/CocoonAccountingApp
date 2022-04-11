@@ -1,4 +1,4 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.service.IAuthenticationFacade;
 import org.springframework.security.core.Authentication;

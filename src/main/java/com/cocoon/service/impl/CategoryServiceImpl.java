@@ -1,40 +1,29 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.dto.CategoryDTO;
-import com.cocoon.dto.CompanyDTO;
 import com.cocoon.dto.ProductDTO;
 import com.cocoon.entity.Category;
 import com.cocoon.entity.Company;
-import com.cocoon.entity.Product;
-import com.cocoon.entity.common.UserPrincipal;
 import com.cocoon.exception.CocoonException;
 import com.cocoon.repository.CategoryRepo;
-import com.cocoon.repository.ProductRepository;
 import com.cocoon.service.CategoryService;
 import com.cocoon.service.CompanyService;
 import com.cocoon.service.ProductService;
 import com.cocoon.util.MapperUtil;
-import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CategoryServiceImpl implements CategoryService{
 
     private CategoryRepo categoryRepo;
     private MapperUtil mapperUtil;
     private ProductService productService;
     private CompanyService companyService;
-
-    public CategoryServiceImpl(CategoryRepo categoryRepo, MapperUtil mapperUtil,
-                               ProductService productService, CompanyService companyService) {
-        this.categoryRepo = categoryRepo;
-        this.mapperUtil = mapperUtil;
-        this.productService = productService;
-        this.companyService = companyService;
-    }
 
     @Override
     public List<CategoryDTO> getAllCategories() {
@@ -55,30 +44,24 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryDTO getCategoryByDescription(String descrition) throws CocoonException {
-        Category category = categoryRepo.getByDescription(descrition);
+    public CategoryDTO getCategoryByDescription(String description) throws CocoonException {
+        Category category = categoryRepo.getByDescription(description);
         if (category==null)
             throw new CocoonException("there is no category which you search");
-        CategoryDTO categoryDTO = mapperUtil.convert(category, new CategoryDTO());
-        return categoryDTO;
+        return mapperUtil.convert(category, new CategoryDTO());
     }
 
     @Override
     public void update(CategoryDTO categoryDTO) throws CocoonException {
-        Category category = categoryRepo.getById(categoryDTO.getId());
-        if (category==null)
-            throw new CocoonException("there is no cateory");
+        Category category = categoryRepo.findById(categoryDTO.getId()).orElseThrow(() -> new CocoonException("there is no category"));
         category.setDescription(categoryDTO.getDescription());
         categoryRepo.save(category);
-
-
     }
 
     @Override
     public CategoryDTO getById(Long id) {
         Category category = categoryRepo.getById(id);
-        CategoryDTO categoryDTO = mapperUtil.convert(category, new CategoryDTO());
-        return categoryDTO;
+        return mapperUtil.convert(category, new CategoryDTO());
     }
 
     @Override

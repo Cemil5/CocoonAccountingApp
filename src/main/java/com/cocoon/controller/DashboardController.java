@@ -30,7 +30,7 @@ public class DashboardController {
     private  final CompanyService companyService;
     private final InvoiceService invoiceService;
 
-    private WebClient webClient = WebClient.create("http://data.fixer.io");
+    private final WebClient webClient = WebClient.create("http://data.fixer.io");
 
     public DashboardController(CompanyService companyService, InvoiceService invoiceService) {
         this.companyService = companyService;

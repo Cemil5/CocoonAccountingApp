@@ -1,4 +1,4 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.dto.ClientDTO;
 import com.cocoon.dto.CompanyDTO;
@@ -45,7 +45,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
         Client toSave = mapperUtil.convert(clientDTO, new Client());
         toSave.setCompany(mapperUtil.convert(userCompany, new Company()));
 
-        Client savedClient = clientVendorRepo.save(toSave);
+        clientVendorRepo.save(toSave);
     }
 
     public List<ClientDTO> getAllClientsVendorsActivesFirst() {

@@ -1,7 +1,7 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.service.EmailSender;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -10,9 +10,9 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 @Service
+@AllArgsConstructor
 public class EmailSenderImpl implements EmailSender {
 
-    @Autowired
     private JavaMailSender mailSender;
 
     @Override

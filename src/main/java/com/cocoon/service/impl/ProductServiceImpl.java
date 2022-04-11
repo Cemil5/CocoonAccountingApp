@@ -1,7 +1,5 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
-import com.cocoon.dto.CompanyDTO;
-import com.cocoon.dto.InvoiceDTO;
 import com.cocoon.dto.InvoiceProductDTO;
 import com.cocoon.dto.ProductDTO;
 import com.cocoon.entity.*;
@@ -9,7 +7,6 @@ import com.cocoon.enums.InvoiceType;
 import com.cocoon.enums.ProductStatus;
 import com.cocoon.enums.Unit;
 import com.cocoon.exception.CocoonException;
-import com.cocoon.repository.CompanyRepo;
 import com.cocoon.repository.InvoiceProductRepo;
 import com.cocoon.repository.ProductRepository;
 import com.cocoon.service.CompanyService;
@@ -19,10 +16,8 @@ import com.cocoon.util.MapperUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO getProductById(Long id) throws CocoonException {
         Optional<Product> product = productRepository.findById(id);
-        if(!product.isPresent()){
+        if(product.isEmpty()){
             throw new CocoonException("There is no product belongs to this id " + id);
         }
         return mapperUtil.convert(product.get(), new ProductDTO());
@@ -81,6 +76,9 @@ public class ProductServiceImpl implements ProductService {
         Product convertedProduct = mapperUtil.convert(productDTO, new Product());
         convertedProduct.setId(product.get().getId());
         convertedProduct.setEnabled(product.get().getEnabled());
+        convertedProduct.setQty(product.get().getQty());
+        convertedProduct.setTax(product.get().getTax());
+        convertedProduct.setCompany(product.get().getCompany());
         Company company = mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
         convertedProduct.setCompany(company);
         productRepository.save(convertedProduct);
@@ -88,26 +86,22 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductStatus getProductStatusById(Long id) throws CocoonException {
-        Optional<Product> product =productRepository.findById(id);
-        if(!product.isPresent()){
-            throw new CocoonException("There is no product belongs to this id " + id);
-        }
-        return product.get().getProductStatus();
+        Product product =productRepository.findById(id)
+                .orElseThrow(() -> new CocoonException("There is no product belongs to this id " + id));
+        return product.getProductStatus();
     }
 
     @Override
     public Unit getUnitById(Long id) throws CocoonException {
-        Optional<Product> product =productRepository.findById(id);
-        if(!product.isPresent()){
-            throw new CocoonException("There is no product belongs to this id " + id);
-        }
-        return product.get().getUnit();
+        Product product =productRepository.findById(id)
+                .orElseThrow(() -> new CocoonException("There is no product belongs to this id " + id));
+        return product.getUnit();
     }
 
     @Override
     public void deleteById(Long id) throws CocoonException {
         Optional<Product> product = productRepository.findById(id);
-        if(!product.isPresent()){
+        if(product.isEmpty()){
             throw new CocoonException("There is no product belongs to this id " + id);
         }
         // check if product has related invoice or not
@@ -115,15 +109,14 @@ public class ProductServiceImpl implements ProductService {
         if (invoiceProducts.size() ==0) {
             product.get().setIsDeleted(true); // soft delete
             productRepository.save(product.get());
-        }
+        } else throw new CocoonException("This product has relation with Invoice Product and cannot be deleted");
     }
 
 
     @Override
     public List<ProductDTO> findProductsByCategoryId(Long id) {
         List<Product> products = productRepository.findAllByCategoryId(id);
-        List<ProductDTO> productDTOList = products.stream().map((p) -> mapperUtil.convert(p, new ProductDTO())).collect(Collectors.toList());
-        return productDTOList;
+        return products.stream().map((p) -> mapperUtil.convert(p, new ProductDTO())).collect(Collectors.toList());
     }
 
     @Override

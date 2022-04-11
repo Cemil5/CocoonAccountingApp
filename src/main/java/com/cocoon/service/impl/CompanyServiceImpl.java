@@ -1,23 +1,20 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.dto.CompanyDTO;
 import com.cocoon.dto.UserDTO;
 import com.cocoon.entity.Company;
-import com.cocoon.entity.User;
-import com.cocoon.entity.common.UserPrincipal;
 import com.cocoon.exception.CocoonException;
 import com.cocoon.repository.CompanyRepo;
 import com.cocoon.service.CompanyService;
 import com.cocoon.service.UserService;
 import com.cocoon.util.MapperUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -25,20 +22,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
 
-    @Autowired
     private CompanyRepo companyRepo;
-    @Autowired
     private MapperUtil mapperUtil;
-    @Autowired
     private UserService userService;
 
     @Override
     public CompanyDTO getCompanyById(Long id) throws CocoonException {
         Optional<Company> companyOptional = companyRepo.findById(id);
-        if (!companyOptional.isPresent())
-            throw new CocoonException("There is no company with id " + id);
+        if (companyOptional.isEmpty())
+            throw new CocoonException("There is no company with id : " + id);
 
         return mapperUtil.convert(companyOptional.get(), new CompanyDTO());
     }

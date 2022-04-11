@@ -23,7 +23,7 @@ public interface InvoiceProductRepo extends JpaRepository<InvoiceProduct, Long> 
 //    @Query(nativeQuery = true, value = "select ip.id, ip.invoice_id, ip.product_id, ip.qty, ip.price, i.invoice_type, i.invoice_date, p.name, p.unit from invoice_product ip " +
 //                                        " left join invoice i on i.id = ip.invoice_id " +
 //                                        " left join product p on p.id = ip.product_id ")
-@Query(nativeQuery = true, value = "select ip.*, i.*, p.name, p.unit from invoice_product ip " +
+    @Query(nativeQuery = true, value = "select ip.*, i.*, p.name, p.unit from invoice_product ip " +
         " left join invoice i on i.id = ip.invoice_id " +
         " left join product p on p.id = ip.product_id ")
     List<InvoiceProduct> getStockReportList();

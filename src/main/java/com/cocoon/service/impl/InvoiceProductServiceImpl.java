@@ -1,4 +1,4 @@
-package com.cocoon.implementation;
+package com.cocoon.service.impl;
 
 import com.cocoon.dto.InvoiceProductDTO;
 import com.cocoon.entity.Invoice;
@@ -11,12 +11,14 @@ import com.cocoon.repository.InvoiceRepository;
 import com.cocoon.service.InvoiceProductService;
 import com.cocoon.service.ProductService;
 import com.cocoon.util.MapperUtil;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     private final InvoiceProductRepo invoiceProductRepo;
@@ -24,13 +26,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final MapperUtil mapperUtil;
     private final ProductService productService;
 
-    public InvoiceProductServiceImpl(InvoiceProductRepo invoiceProductRepo, InvoiceRepository invoiceRepository, MapperUtil mapperUtil, ProductService productService) {
-        this.invoiceProductRepo = invoiceProductRepo;
-        this.invoiceRepository = invoiceRepository;
-        this.mapperUtil = mapperUtil;
-        this.productService = productService;
-    }
-
+    // notUsed
     @Override
     public InvoiceProductDTO save(InvoiceProductDTO invoiceProductDTO) {
         InvoiceProduct invoiceProduct = mapperUtil.convert(invoiceProductDTO, new InvoiceProduct());
@@ -96,15 +92,17 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     public boolean validateProductQtyForPendingInvoicesIncluded(InvoiceProductDTO dto) throws CocoonException {
-        List<InvoiceProduct> invoiceProducts = invoiceProductRepo.findAllByProductIdAndInvoiceInvoiceStatus(dto.getProductDTO().getId(), InvoiceStatus.PENDING);
+        List<InvoiceProduct> invoiceProducts = invoiceProductRepo.
+                findAllByProductIdAndInvoiceInvoiceStatus(dto.getProductDTO().getId(), InvoiceStatus.PENDING);
         int totalQty = invoiceProducts.stream().mapToInt(InvoiceProduct::getQty).sum();
         return totalQty + dto.getQty() <= productService.getProductById(dto.getProductDTO().getId()).getQty();
     }
 
     @Override
-    public ArrayList<InvoiceProductDTO> getStockReportList() {
-        ArrayList<InvoiceProduct> products = (ArrayList<InvoiceProduct>) invoiceProductRepo.getStockReportListProducts();
-        return (ArrayList<InvoiceProductDTO>) products.stream().map(ip -> mapperUtil.convert(ip, new InvoiceProductDTO())).collect(Collectors.toList());
+    public List<InvoiceProductDTO> getStockReportList() {
+        List<InvoiceProduct> products = invoiceProductRepo.getStockReportListProducts();
+        return products.stream()
+                .map(ip -> mapperUtil.convert(ip, new InvoiceProductDTO())).collect(Collectors.toList());
     }
 
 

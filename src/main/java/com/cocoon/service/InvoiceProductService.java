@@ -18,5 +18,5 @@ public interface InvoiceProductService{
     void approveInvoiceProduct(Long id);
     void deleteInvoiceProducts(Long id);
     boolean validateProductQtyForPendingInvoicesIncluded(InvoiceProductDTO dto) throws CocoonException;
-    ArrayList<InvoiceProductDTO> getStockReportList();
+    List<InvoiceProductDTO> getStockReportList();
 }
