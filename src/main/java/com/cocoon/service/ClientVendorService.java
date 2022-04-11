@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface ClientVendorService {
 
-    void save(ClientDTO clientDTO) throws CocoonException;
+    void save(ClientDTO clientDTO);
 
     List<ClientDTO> getAllClientsVendorsActivesFirst();
 
-    ClientDTO findById(Long id) throws CocoonException;
+    ClientDTO findById(Long id);
 
-    ClientDTO update (ClientDTO clientDTO) throws CocoonException;
+    ClientDTO update (ClientDTO clientDTO);
 
-    void deleteClientVendor(Long id) throws CocoonException;
+    void deleteClientVendor(Long id);
 
     List<ClientDTO> getAllClientVendorsByType(CompanyType type);
 

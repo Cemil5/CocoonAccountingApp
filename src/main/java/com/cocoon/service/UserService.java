@@ -13,11 +13,11 @@ public interface UserService {
 
     UserDTO save(UserDTO userDTO) throws CocoonException;
 
-    UserDTO findById(Long id) throws CocoonException;
+    UserDTO findById(Long id);
 
     UserDTO findByEmail(String email);
 
-    void delete(Long id) throws CocoonException;
+    void delete(Long id);
 
     List<UserDTO> findAllUsersForLogging();
 }

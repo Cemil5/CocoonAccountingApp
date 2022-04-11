@@ -1,8 +1,8 @@
 package com.cocoon.aspect;
 
-import com.cocoon.service.UserLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
@@ -13,23 +13,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Slf4j
 public class LoggingAspect {
 
-    UserLogService userLogService;
-
-    public LoggingAspect(UserLogService userLogService) {
-        this.userLogService = userLogService;
-    }
-
-    //    @Pointcut("execution(* com.cocoon.controller.*.*(..)) && !execution(* com.cocoon.controller.UserLogController.*(..)) && !execution(* com.cocoon.controller.LoginController.*(..))")
     @Pointcut("execution(* com.cocoon.controller.*.*(..)) && !execution(* com.cocoon.controller.LoginController.*(..))")
     public void controllerPointCut() {
     }
 
     @Pointcut("execution(* com.cocoon.service.*.*(..)) && !execution(* com.cocoon.service.SecurityService.*(..))")
     public void servicePointCut() {
-    }
-
-    @Pointcut("execution(* org.springframework.data.jpa.repository.JpaRepository.*(..)) || execution(* com.cocoon.repository.*.*(..))")
-    public void repositoryPointCut() {
     }
 
     @Before("controllerPointCut()")
@@ -43,19 +32,19 @@ public class LoggingAspect {
         log.info("[Service Operation]: User-> {}, Method-> {}, Parameters-> {}", getAuthUsername(), joinPoint.getSignature().toShortString(), joinPoint.getArgs());
     }
 
-    @Before("repositoryPointCut()")
-    public void repositoryAdvice(JoinPoint joinPoint) {
-        log.info("[Repository Operation]: User-> {}, Method-> {}, Parameters-> {}", getAuthUsername(), joinPoint.getSignature().toShortString(), joinPoint.getArgs());
-    }
-
-    @AfterThrowing(pointcut = "controllerPointCut() || servicePointCut() || repositoryPointCut()", throwing = "exception")
+    @AfterThrowing(pointcut = "controllerPointCut() || servicePointCut()", throwing = "exception")
     public void throwingAdvice(JoinPoint joinPoint, Exception exception) {
         log.info("[!!!Exception Thrown!!!]: User-> {}, Method-> {}, Parameters-> {}, Exception-> {}", getAuthUsername(), joinPoint.getSignature().toShortString(), joinPoint.getArgs(), exception.getMessage());
     }
 
-    @AfterReturning("controllerPointCut()")
-    public void databaseLoggingAdvice(JoinPoint joinPoint){
-        userLogService.save(getAuthUsername(), joinPoint.getSignature().toShortString());
+    @Around("controllerPointCut()")
+    public Object performanceLoggingAdvice(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        long beforeOperation = System.currentTimeMillis();
+        Object result = proceedingJoinPoint.proceed();
+        long afterOperation = System.currentTimeMillis();
+        long operationTime = afterOperation - beforeOperation;
+        log.info("[Performance Log]: Execution Time-> {} ms, User-> {}, Operation-> {}", operationTime, getAuthUsername(), proceedingJoinPoint.getSignature().toShortString());
+        return result;
     }
 
     private String getAuthUsername(){

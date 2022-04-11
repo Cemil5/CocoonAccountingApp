@@ -1,6 +1,5 @@
 package com.cocoon.dto;
 
-import com.cocoon.entity.Client;
 import com.cocoon.entity.Company;
 import com.cocoon.enums.InvoiceStatus;
 import com.cocoon.enums.InvoiceType;
@@ -26,7 +25,7 @@ public class InvoiceDTO {
     private InvoiceType invoiceType;
     private Byte enabled;
     private Company company;
-    private Client client;
+    private ClientDTO client;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate invoiceDate;

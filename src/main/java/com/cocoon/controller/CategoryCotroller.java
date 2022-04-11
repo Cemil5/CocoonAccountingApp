@@ -18,11 +18,9 @@ import java.util.Date;
 public class CategoryCotroller {
 
     private final CategoryService categoryService;
-    private final CompanyService companyService;
 
-    public CategoryCotroller(CategoryService categoryService, CompanyService companyService) {
+    public CategoryCotroller(CategoryService categoryService) {
         this.categoryService = categoryService;
-        this.companyService = companyService;
     }
 
 
@@ -60,14 +58,6 @@ public class CategoryCotroller {
     public String deleteCategory(@PathVariable("id") String id,CategoryDTO categoryDTO) throws CocoonException {
         categoryService.delete(categoryDTO);
         return "redirect:/category/list";
-    }
-
-    @ModelAttribute
-    public void addAttributes(Model model) {
-        model.addAttribute("date", new Date());
-        model.addAttribute("localDateTime", LocalDateTime.now());
-        model.addAttribute("localDate", LocalDate.now());
-        model.addAttribute("java8Instant", Instant.now());
     }
 
 }

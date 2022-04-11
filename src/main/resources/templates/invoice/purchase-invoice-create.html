@@ -20,7 +20,7 @@
                     <!-- PURCHASE INVOICE LIST LINK -->
                     <div class="users-list-filter px-2">
                         <div class="col-12 col-sm-6 col-lg-3 d-flex align-items-right">
-                            <a class="btn btn-primary bg-light-primary mb-1" th:href="@{/purchase-invoice/list(cancel='true')}"
+                            <a class="btn btn-primary bg-light-primary mb-1" th:href="@{/purchase-invoice/list}"
                             ><i class="fa fa-list mr-1"></i>Purchase Invoices list</a>
                         </div>
                     </div>
@@ -78,7 +78,7 @@
                                                             <div class="form-group">
                                                                 <div class="controls">
                                                                     <label>CANCEL</label>
-                                                                    <a class="btn btn-danger" th:href="@{/purchase-invoice/list(cancel='true')}"
+                                                                    <a class="btn btn-danger" th:href="@{/purchase-invoice/list}"
                                                                             type="cancel" value="cancel">Cancel
                                                                     </a>
                                                                 </div>
@@ -89,7 +89,7 @@
                                                                 <div class="controls">
                                                                     <label>CREATE</label>
                                                                     <button class="btn btn-success"
-                                                                            type="submit" name="action" th:disabled="${active}" >Create
+                                                                            type="submit" name="action" >Create
                                                                     </button>
                                                                 </div>
                                                             </div>

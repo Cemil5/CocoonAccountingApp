@@ -14,8 +14,6 @@ public interface InvoiceService {
 
     InvoiceDTO save(InvoiceDTO invoice);
 
-    List<InvoiceDTO> getAllInvoices();
-
     InvoiceDTO getInvoiceById(Long id);
 
     InvoiceDTO update(InvoiceDTO dto, Long id);
@@ -23,8 +21,6 @@ public interface InvoiceService {
     String getInvoiceNumber(InvoiceType invoiceType);
 
     void deleteInvoiceById(Long id);
-
-    List<InvoiceDTO> getAllInvoicesSorted();
 
     List<InvoiceDTO> getAllInvoicesByCompanyAndType(InvoiceType type);
 

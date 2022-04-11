@@ -8,19 +8,19 @@ import java.util.List;
 
 public interface CompanyService {
 
-    CompanyDTO getCompanyById(Long id) throws CocoonException;
+    CompanyDTO getCompanyById(Long id);
 
     CompanyDTO getCompanyByLoggedInUser();
 
-    CompanyDTO update(CompanyDTO companyDTO)throws CocoonException;
+    CompanyDTO update(CompanyDTO companyDTO);
 
-    void close(CompanyDTO companyDTO)throws CocoonException;
+    void close(CompanyDTO companyDTO);
 
-    void open(CompanyDTO companyDTO)throws CocoonException;
+    void open(CompanyDTO companyDTO);
 
-    void delete(CompanyDTO companyDTO)throws CocoonException;
+    void delete(CompanyDTO companyDTO);
 
     List<CompanyDTO> getAllCompanies();
 
-    void save(CompanyDTO company) throws CocoonException;
+    void save(CompanyDTO company);
 }

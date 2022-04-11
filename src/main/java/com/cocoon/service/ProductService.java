@@ -19,12 +19,12 @@ public interface ProductService {
     List<ProductDTO> getAllProducts();
     List<ProductDTO> getAllProductsByCompany();
     ProductDTO save(ProductDTO productDTO);
-    ProductDTO getProductById(Long id) throws CocoonException;
+    ProductDTO getProductById(Long id);
     void update(ProductDTO productDTO) throws CocoonException;
-    ProductStatus getProductStatusById(Long id) throws CocoonException;
-    Unit getUnitById(Long id) throws CocoonException;
+    ProductStatus getProductStatusById(Long id);
+    Unit getUnitById(Long id);
 
-    void deleteById (Long id) throws CocoonException;
+    void deleteById (Long id);
     List<ProductDTO> findProductsByCategoryId(Long id);
     void updateProductQuantity(InvoiceType type, InvoiceProduct invoiceProduct);
     boolean validateProductQuantity(InvoiceProductDTO invoiceProductDTO);

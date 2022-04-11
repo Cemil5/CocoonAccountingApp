@@ -1,4 +1,4 @@
-package com.cocoon.service.impl;
+package com.cocoon.implementation;
 
 import com.cocoon.dto.InvoiceProductDTO;
 import com.cocoon.dto.ProductDTO;
@@ -7,7 +7,8 @@ import com.cocoon.enums.InvoiceType;
 import com.cocoon.enums.ProductStatus;
 import com.cocoon.enums.Unit;
 import com.cocoon.exception.CocoonException;
-import com.cocoon.repository.InvoiceProductRepo;
+import com.cocoon.exception.NoSuchProductException;
+import com.cocoon.repository.InvoiceProductRepository;
 import com.cocoon.repository.ProductRepository;
 import com.cocoon.service.CompanyService;
 import com.cocoon.service.InvoiceService;
@@ -23,18 +24,16 @@ import java.util.stream.Collectors;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    private ProductRepository productRepository;
-    private InvoiceService invoiceService;
-    private MapperUtil mapperUtil;
-    private CompanyService companyService;
-    private InvoiceProductRepo invoiceProductRepo;
+    private final ProductRepository productRepository;
+    private final MapperUtil mapperUtil;
+    private final CompanyService companyService;
+    private final InvoiceProductRepository invoiceProductRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, @Lazy InvoiceService invoiceService, MapperUtil mapperUtil, CompanyService companyService, @Lazy InvoiceProductRepo invoiceProductRepo) {
+    public ProductServiceImpl(ProductRepository productRepository, MapperUtil mapperUtil, CompanyService companyService, @Lazy InvoiceProductRepository invoiceProductRepository) {
         this.productRepository = productRepository;
-        this.invoiceService = invoiceService;
         this.mapperUtil = mapperUtil;
         this.companyService = companyService;
-        this.invoiceProductRepo = invoiceProductRepo;
+        this.invoiceProductRepository = invoiceProductRepository;
     }
 
     @Override
@@ -62,10 +61,10 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public ProductDTO getProductById(Long id) throws CocoonException {
+    public ProductDTO getProductById(Long id) {
         Optional<Product> product = productRepository.findById(id);
-        if(product.isEmpty()){
-            throw new CocoonException("There is no product belongs to this id " + id);
+        if(!product.isPresent()){
+            throw new NoSuchProductException(id);
         }
         return mapperUtil.convert(product.get(), new ProductDTO());
     }
@@ -76,47 +75,49 @@ public class ProductServiceImpl implements ProductService {
         Product convertedProduct = mapperUtil.convert(productDTO, new Product());
         convertedProduct.setId(product.get().getId());
         convertedProduct.setEnabled(product.get().getEnabled());
-        convertedProduct.setQty(product.get().getQty());
-        convertedProduct.setTax(product.get().getTax());
-        convertedProduct.setCompany(product.get().getCompany());
         Company company = mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
         convertedProduct.setCompany(company);
         productRepository.save(convertedProduct);
     }
 
     @Override
-    public ProductStatus getProductStatusById(Long id) throws CocoonException {
-        Product product =productRepository.findById(id)
-                .orElseThrow(() -> new CocoonException("There is no product belongs to this id " + id));
-        return product.getProductStatus();
+    public ProductStatus getProductStatusById(Long id) {
+        Optional<Product> product =productRepository.findById(id);
+        if(!product.isPresent()){
+            throw new NoSuchProductException(id);
+        }
+        return product.get().getProductStatus();
     }
 
     @Override
-    public Unit getUnitById(Long id) throws CocoonException {
-        Product product =productRepository.findById(id)
-                .orElseThrow(() -> new CocoonException("There is no product belongs to this id " + id));
-        return product.getUnit();
+    public Unit getUnitById(Long id) {
+        Optional<Product> product =productRepository.findById(id);
+        if(!product.isPresent()){
+            throw new NoSuchProductException(id);
+        }
+        return product.get().getUnit();
     }
 
     @Override
-    public void deleteById(Long id) throws CocoonException {
+    public void deleteById(Long id) {
         Optional<Product> product = productRepository.findById(id);
-        if(product.isEmpty()){
-            throw new CocoonException("There is no product belongs to this id " + id);
+        if(!product.isPresent()){
+            throw new NoSuchProductException(id);
         }
         // check if product has related invoice or not
-        List<InvoiceProduct> invoiceProducts = invoiceProductRepo.findAllByProductId(id);
+        List<InvoiceProduct> invoiceProducts = invoiceProductRepository.findAllByProductId(id);
         if (invoiceProducts.size() ==0) {
             product.get().setIsDeleted(true); // soft delete
             productRepository.save(product.get());
-        } else throw new CocoonException("This product has relation with Invoice Product and cannot be deleted");
+        }
     }
 
 
     @Override
     public List<ProductDTO> findProductsByCategoryId(Long id) {
         List<Product> products = productRepository.findAllByCategoryId(id);
-        return products.stream().map((p) -> mapperUtil.convert(p, new ProductDTO())).collect(Collectors.toList());
+        List<ProductDTO> productDTOList = products.stream().map((p) -> mapperUtil.convert(p, new ProductDTO())).collect(Collectors.toList());
+        return productDTOList;
     }
 
     @Override

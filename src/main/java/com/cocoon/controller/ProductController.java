@@ -20,14 +20,12 @@ import java.util.Date;
 @RequestMapping("/product")
 public class ProductController {
 
-    private ProductService productService;
-    private CategoryService categoryService;
-    private final CompanyService companyService;
+    private final ProductService productService;
+    private final CategoryService categoryService;
 
-    public ProductController(ProductService productService, CategoryService categoryService, CompanyService companyService) {
+    public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
         this.categoryService = categoryService;
-        this.companyService = companyService;
     }
 
     @GetMapping("/list")
@@ -73,14 +71,5 @@ public class ProductController {
         productService.deleteById(id);
         return "redirect:/product/list";
     }
-
-    @ModelAttribute
-    public void addAttributes(Model model) {
-        model.addAttribute("date", new Date());
-        model.addAttribute("localDateTime", LocalDateTime.now());
-        model.addAttribute("localDate", LocalDate.now());
-        model.addAttribute("java8Instant", Instant.now());
-    }
-
 
 }

@@ -1,14 +1,14 @@
-package com.cocoon.service.impl;
+package com.cocoon.implementation;
 
 import com.cocoon.dto.CompanyDTO;
 import com.cocoon.dto.UserDTO;
 import com.cocoon.entity.Company;
+import com.cocoon.enums.InputConstraint;
 import com.cocoon.exception.CocoonException;
-import com.cocoon.repository.CompanyRepo;
+import com.cocoon.repository.CompanyRepository;
 import com.cocoon.service.CompanyService;
 import com.cocoon.service.UserService;
 import com.cocoon.util.MapperUtil;
-import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,18 +22,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
 
-    private CompanyRepo companyRepo;
-    private MapperUtil mapperUtil;
-    private UserService userService;
+    private final CompanyRepository companyRepository;
+    private final MapperUtil mapperUtil;
+    private final UserService userService;
+
+    public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, UserService userService) {
+        this.companyRepository = companyRepository;
+        this.mapperUtil = mapperUtil;
+        this.userService = userService;
+    }
 
     @Override
-    public CompanyDTO getCompanyById(Long id) throws CocoonException {
-        Optional<Company> companyOptional = companyRepo.findById(id);
-        if (companyOptional.isEmpty())
-            throw new CocoonException("There is no company with id : " + id);
+    public CompanyDTO getCompanyById(Long id) {
+        Optional<Company> companyOptional = companyRepository.findById(id);
+        if (!companyOptional.isPresent())
+            throw new CocoonException("There is no company with id " + id);
 
         return mapperUtil.convert(companyOptional.get(), new CompanyDTO());
     }
@@ -46,40 +51,39 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public CompanyDTO update(CompanyDTO companyDTO) throws CocoonException {
+    public CompanyDTO update(CompanyDTO companyDTO) {
 
-       Company company=companyRepo.getById(companyDTO.getId());
+       Company company= companyRepository.getById(companyDTO.getId());
        Company convertedCompanyEntity=mapperUtil.convert(companyDTO,new Company());
        convertedCompanyEntity.setId(company.getId());
        convertedCompanyEntity.setEnabled(company.getEnabled());
-       companyRepo.save(convertedCompanyEntity);
+       companyRepository.save(convertedCompanyEntity);
        return getCompanyById(companyDTO.getId());
     }
 
     @Override
-    public void close(CompanyDTO companyDTO) throws CocoonException {
-        Company company=companyRepo.getById(companyDTO.getId());
+    public void close(CompanyDTO companyDTO) {
+        Company company= companyRepository.getById(companyDTO.getId());
         Company convertedCompanyEntity=mapperUtil.convert(companyDTO,new Company());
         convertedCompanyEntity.setId(company.getId());
         convertedCompanyEntity.setEnabled((byte) 0);
-        companyRepo.save(convertedCompanyEntity);
-
+        companyRepository.save(convertedCompanyEntity);
     }
 
     @Override
-    public void open(CompanyDTO companyDTO) throws CocoonException {
+    public void open(CompanyDTO companyDTO) {
 
-        Company company=companyRepo.getById(companyDTO.getId());
+        Company company= companyRepository.getById(companyDTO.getId());
         Company convertedCompanyEntity=mapperUtil.convert(companyDTO,new Company());
         convertedCompanyEntity.setId(company.getId());
         convertedCompanyEntity.setEnabled((byte) 1);
-        companyRepo.save(convertedCompanyEntity);
+        companyRepository.save(convertedCompanyEntity);
 
     }
 
     @Override
-    public void delete(CompanyDTO companyDTO) throws CocoonException {
-        companyRepo.delete(companyRepo.getById(companyDTO.getId()));
+    public void delete(CompanyDTO companyDTO) {
+        companyRepository.delete(companyRepository.getById(companyDTO.getId()));
     }
 
     @Override
@@ -88,7 +92,7 @@ public class CompanyServiceImpl implements CompanyService {
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
         if (roles.contains("ROOT")) {
-            List<Company> companyList = companyRepo.findAll();
+            List<Company> companyList = companyRepository.findAll();
             return companyList.stream().map(company ->
                     mapperUtil.convert(company, new CompanyDTO())).collect(Collectors.toList());
         } else {
@@ -97,9 +101,9 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public void save(CompanyDTO companyDTO) throws CocoonException{
+    public void save(CompanyDTO companyDTO){
         //if same company name already exists in company table we have to throw exception
-        if (companyRepo.existsByTitle(companyDTO.getTitle()))
+        if (companyRepository.existsByTitle(companyDTO.getTitle()))
             throw new CocoonException("This company name already saved to database.");
 
         //if establishment date is a date in the future, it makes no sense. it is not permitted
@@ -110,15 +114,15 @@ public class CompanyServiceImpl implements CompanyService {
 
         //if the input address value length exceeds 254 chars then we need to split it two
         // and save the rest in the second address field
-        if (companyDTO.getAddress1().length() > 254){
+        if (companyDTO.getAddress1().length() > InputConstraint.ADDRESS_INPUT.getMaxLength()){
             String fullAddress = companyDTO.getAddress1();
-            int indexOfSpaceBeforeSplitLength = fullAddress.substring(0, 254).lastIndexOf(" ");
+            int indexOfSpaceBeforeSplitLength = fullAddress.substring(0, InputConstraint.ADDRESS_INPUT.getMaxLength()).lastIndexOf(" ");
             companyDTO.setAddress1(fullAddress.substring(0, indexOfSpaceBeforeSplitLength));
             companyDTO.setAddress2(fullAddress.substring(indexOfSpaceBeforeSplitLength + 1));
         }
 
         //saving to database
-        Company savedCompany = companyRepo.save(mapperUtil.convert(companyDTO, new Company()));
+        Company savedCompany = companyRepository.save(mapperUtil.convert(companyDTO, new Company()));
     }
 /*
     @Override

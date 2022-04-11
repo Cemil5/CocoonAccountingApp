@@ -253,52 +253,52 @@
                                                         <h1 class="invoice-id" th:text="${invoice.invoiceNumber}"></h1>
                                                         <div class="date" th:text="'Invoice Date: '+${invoice.invoiceDate}"></div>
                                                     </div>
-                                                <table>
-                                                    <thead>
-                                                    <tr>
-                                                        <th class="text-left">#</th>
-                                                        <th class="text-left">Product</th>
-                                                        <th class="text-right">Price</th>
-                                                        <th class="text-right">Quantity</th>
-                                                        <th class="text-right">Tax</th>
-                                                        <th class="text-right">Total</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr th:each="invoiceProduct, iStat :${invoiceProducts}">
-                                                        <td class="total" th:text="${iStat.count}"></td>
-                                                        <td class="text-left"><h3 th:text="${invoiceProduct.name}"></h3></td>
-                                                        <td class="unit" th:text="'$ '+${invoiceProduct.price}"></td>
-                                                        <td class="unit" th:text="${invoiceProduct.qty}"></td>
-                                                        <td class="unit" th:text="'% '+${invoiceProduct.tax}"></td>
-                                                        <td class="total" th:text="'$ '+${(invoiceProduct.qty * invoiceProduct.price) + (invoiceProduct.qty * invoiceProduct.price * invoiceProduct.tax * 0.01)}"></td>
-                                                    </tr>
-                                                    </tbody>
-                                                    <tfoot>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td colspan="2"></td>
-                                                        <td colspan="2">SUBTOTAL</td>
-                                                        <td th:text="'$ '+${invoice.getInvoiceCostWithoutTax()}"></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td colspan="2"></td>
-                                                        <td colspan="2">TAX </td>
-                                                        <td th:text="'$ '+${invoice.getInvoiceCostWithTax()}">510</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td></td>
-                                                        <td colspan="2"></td>
-                                                        <td colspan="2">GRAND TOTAL</td>
-                                                        <td th:text="'$ '+${invoice.getTotalCost()}"></td>
-                                                    </tr>
-                                                    </tfoot>
-                                                </table>
-                                                <div class="notices">
-                                                    <div>NOTICE:</div>
-                                                    <div class="notice">A finance charge of 1.5% will be made on unpaid balances after 30 days.</div>
-                                                </div>
+                                                    <table>
+                                                        <thead>
+                                                        <tr>
+                                                            <th class="text-left">#</th>
+                                                            <th class="text-left">Product</th>
+                                                            <th class="text-right">Price</th>
+                                                            <th class="text-right">Quantity</th>
+                                                            <th class="text-right">Tax</th>
+                                                            <th class="text-right">Total</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr th:each="invoiceProduct, iStat :${invoiceProducts}">
+                                                            <td class="total" th:text="${iStat.count}"></td>
+                                                            <td class="text-left"><h3 th:text="${invoiceProduct.name}"></h3></td>
+                                                            <td class="unit" th:text="'$ '+${invoiceProduct.price}"></td>
+                                                            <td class="unit" th:text="${invoiceProduct.qty}"></td>
+                                                            <td class="unit" th:text="'% '+${invoiceProduct.tax}"></td>
+                                                            <td class="total" th:text="'$ '+${(invoiceProduct.qty * invoiceProduct.price) + (invoiceProduct.qty * invoiceProduct.price * invoiceProduct.tax * 0.01)}"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                        <tfoot>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td colspan="2"></td>
+                                                            <td colspan="2">SUBTOTAL</td>
+                                                            <td th:text="'$ '+${invoice.getInvoiceCostWithoutTax()}"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td colspan="2"></td>
+                                                            <td colspan="2">TAX </td>
+                                                            <td th:text="'$ '+${invoice.getInvoiceCostWithTax()}">510</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td colspan="2"></td>
+                                                            <td colspan="2">GRAND TOTAL</td>
+                                                            <td th:text="'$ '+${invoice.getTotalCost()}"></td>
+                                                        </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                    <div class="notices">
+                                                        <div>NOTICE:</div>
+                                                        <div class="notice">A finance charge of 1.5% will be made on unpaid balances after 30 days.</div>
+                                                    </div>
                                                 </div>
                                             </main>
                                             <footer>Invoice was created on a computer and is valid without the signature and seal.</footer>

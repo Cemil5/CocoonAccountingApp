@@ -1,6 +1,6 @@
 package com.cocoon.controller;
 
-import com.cocoon.repository.TestRepo;
+import com.cocoon.repository.TestRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class TestController {
 
 
-    TestRepo testRepo;
+    TestRepository testRepository;
 
-    public TestController(TestRepo testRepo) {
-        this.testRepo = testRepo;
+    public TestController(TestRepository testRepository) {
+        this.testRepository = testRepository;
     }
 
     @RequestMapping(value = {"/test"})
     public String test(Model model){
 
-        model.addAttribute("dbmessage", testRepo.getById(0).getTestval());
+        model.addAttribute("dbmessage", testRepository.getById(0).getTestval());
         return "test";
     }
 

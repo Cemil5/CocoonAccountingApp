@@ -267,7 +267,7 @@
                 </ul>
             </li>
 
-            <li class="dropdown nav-item softer" data-menu="dropdown" style="background: #000066" sec:authorize="hasAnyAuthority('ADMIN','ROOT','MANAGER')"><a
+            <li class="dropdown nav-item softer" data-menu="dropdown" style="background: #000066" sec:authorize="hasAnyAuthority('ADMIN','MANAGER')"><a
 
                     class="dropdown-toggle nav-link d-flex align-items-center" href="javascript:;"
                     data-toggle="dropdown"><i class="ft-archive" style="color: white"></i><span data-i18n="Components" style="color: #ffffff">Administration</span></a>
@@ -277,11 +277,6 @@
                                         class="dropdown-item d-flex align-items-center"
                                         data-toggle="dropdown"><i class="ft-arrow-right submenu-icon"></i><span
                             data-i18n="Grid">MemberShip Payment</span></a>
-                    </li>
-                    <li data-menu=""><a th:href="@{/logging/search}" class="dropdown-item d-flex align-items-center"
-                                        sec:authorize="hasAnyAuthority('ADMIN','ROOT')"
-                                        data-toggle="dropdown"><i class="ft-arrow-right submenu-icon"></i><span
-                            data-i18n="Typography">Log Document</span></a>
                     </li>
                 </ul>
             </li>

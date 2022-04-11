@@ -1,9 +1,10 @@
-package com.cocoon.service.impl;
+package com.cocoon.implementation;
 
 import com.cocoon.dto.UserDTO;
 import com.cocoon.entity.User;
 import com.cocoon.exception.CocoonException;
-import com.cocoon.repository.UserRepo;
+import com.cocoon.exception.UserDoesNotExistException;
+import com.cocoon.repository.UserRepository;
 import com.cocoon.service.CompanyService;
 import com.cocoon.service.UserService;
 import com.cocoon.util.MapperUtil;
@@ -21,13 +22,13 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepo userRepo;
-    private MapperUtil mapperUtil;
-    private PasswordEncoder passwordEncoder;
-    private CompanyService companyService;
+    private final UserRepository userRepository;
+    private final MapperUtil mapperUtil;
+    private final PasswordEncoder passwordEncoder;
+    private final CompanyService companyService;
 
-    public UserServiceImpl(UserRepo userRepo, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy CompanyService companyService) {
-        this.userRepo = userRepo;
+    public UserServiceImpl(UserRepository userRepository, MapperUtil mapperUtil, PasswordEncoder passwordEncoder, @Lazy CompanyService companyService) {
+        this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
         this.passwordEncoder = passwordEncoder;
         this.companyService = companyService;
@@ -37,11 +38,11 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> findAllUsers() {
 
         if (isUserRoot()) {
-            List<User> allUsers = userRepo.findAll();
+            List<User> allUsers = userRepository.findAll();
             return allUsers.stream().map(obj -> mapperUtil.convert(obj, new UserDTO()))
                     .collect(Collectors.toList());
         } else {
-            List<User> allUsers = userRepo.findAllByCompanyId(companyService.getCompanyByLoggedInUser().getId());
+            List<User> allUsers = userRepository.findAllByCompanyId(companyService.getCompanyByLoggedInUser().getId());
             return allUsers.stream().map(obj -> mapperUtil.convert(obj, new UserDTO()))
                     .collect(Collectors.toList());
         }
@@ -51,59 +52,61 @@ public class UserServiceImpl implements UserService {
     public UserDTO update(UserDTO userDTO) throws CocoonException {
         User updatedUser = mapperUtil.convert(userDTO, new User());
         updatedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        User savedUser = userRepo.save(updatedUser);
+        User savedUser = userRepository.save(updatedUser);
         return mapperUtil.convert(savedUser, new UserDTO());
     }
 
     @Override
     public UserDTO save(UserDTO userDTO) throws CocoonException {
-        User foundUser = userRepo.findByEmail(userDTO.getEmail());
+        User foundUser = userRepository.findByEmail(userDTO.getEmail());
         if (foundUser != null) throw new CocoonException("User already exists");
         User convertedUser = mapperUtil.convert(userDTO, new User());
         convertedUser.setPassword(passwordEncoder.encode(convertedUser.getPassword()));
-        User savedUser = userRepo.save(convertedUser);
+        User savedUser = userRepository.save(convertedUser);
         return mapperUtil.convert(savedUser, new UserDTO());
     }
 
     @Override
-    public UserDTO findById(Long id) throws CocoonException {
-        User user;
+    public UserDTO findById(Long id) {
         if (isUserRoot()) {
-            user = userRepo.findById(id).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
+            User user = userRepository.findById(id).orElseThrow(() -> new UserDoesNotExistException(id));
+            return mapperUtil.convert(user, new UserDTO());
         } else {
-            user = userRepo.findByIdAndCompanyId(id, companyService.getCompanyByLoggedInUser().getId()).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
+            User user = userRepository.findByIdAndCompanyId(id, companyService.getCompanyByLoggedInUser().getId()).orElseThrow(() -> new UserDoesNotExistException(id));
+            return mapperUtil.convert(user, new UserDTO());
         }
-        return mapperUtil.convert(user, new UserDTO());
     }
 
     @Override
     public UserDTO findByEmail(String email) {
-        User user = userRepo.findByEmail(email);
+        User user = userRepository.findByEmail(email);
         return mapperUtil.convert(user, new UserDTO());
     }
 
     @Override
-    public void delete(Long id) throws CocoonException {
-        User user;
+    public void delete(Long id) {
+
         if (isUserRoot()) {
-            user = userRepo.findById(id).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
+            User user = userRepository.findById(id).orElseThrow(() -> new UserDoesNotExistException(id));
+            user.setIsDeleted(true);
+            userRepository.save(user);
         } else {
-            user = userRepo.findByIdAndCompanyId(id, companyService.getCompanyByLoggedInUser().getId()).orElseThrow(() -> new CocoonException("User with " + id + " not exist"));
+            User user = userRepository.findByIdAndCompanyId(id, companyService.getCompanyByLoggedInUser().getId()).orElseThrow(() -> new UserDoesNotExistException(id));
+            user.setIsDeleted(true);
+            userRepository.save(user);
         }
-        user.setIsDeleted(true);
-        userRepo.save(user);
     }
 
     @Override
     public List<UserDTO> findAllUsersForLogging() {
-        List<User> allUsers = userRepo.findAll();
+        List<User> allUsers = userRepository.findAll();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
         if (roles.contains("ROOT"))
             return allUsers.stream().map(obj -> mapperUtil.convert(obj, new UserDTO())).collect(Collectors.toList());
         else if (roles.contains("ADMIN")) {
-            User user = userRepo.findByEmail(authentication.getName());
+            User user = userRepository.findByEmail(authentication.getName());
             return allUsers.stream().filter(o -> o.getCompany().getId().equals(user.getCompany().getId()))
                     .map(obj -> mapperUtil.convert(obj, new UserDTO()))
                     .collect(Collectors.toList());
